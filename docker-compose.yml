@@ -1,0 +1,45 @@
+version: '3.9'
+
+services:
+  backend:
+    build: ./backend
+    container_name: fireguard-backend
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - MONGODB_URI=${MONGODB_URI}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - frontend
+    networks:
+      - fireguard_net
+
+  frontend:
+    build: ./frontend
+    container_name: fireguard-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:4000
+    volumes:
+      - ./frontend:/app
+    networks:
+      - fireguard_net
+
+  raspberry:
+    build: ./raspberry
+    container_name: fireguard-pi
+    environment:
+      - BACKEND_URL=http://backend:4000/api/alert
+      - CAMERA_ID=sim_cam_001
+    volumes:
+      - ./raspberry:/app
+    networks:
+      - fireguard_net
+
+networks:
+  fireguard_net:
+    driver: bridge
