@@ -7,13 +7,11 @@ services:
     ports:
       - "4000:4000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=4000
-      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_URI=mongodb+srv://admin:52DfzkN8iHmXbKen@cv-website.e3hp47r.mongodb.net/
     volumes:
       - ./backend:/app
-    depends_on:
-      - frontend
     networks:
       - fireguard_net
 
@@ -23,18 +21,21 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:4000
+      - NODE_ENV=development
+      - VITE_API_BASE=http://localhost:4000
     volumes:
-      - ./frontend:/app
+      - ./frontend/src:/app/src  # Only mount src, not entire app
+      - ./frontend/public:/app/public  # Mount public separately if needed
+      # Remove the node_modules volume override
     networks:
       - fireguard_net
-
+      
   raspberry:
     build: ./raspberry
     container_name: fireguard-pi
     environment:
       - BACKEND_URL=http://backend:4000/api/alert
-      - CAMERA_ID=sim_cam_001
+      - CAMERA_ID=690de2f8681e49c3be38c4b7
     volumes:
       - ./raspberry:/app
     networks:
